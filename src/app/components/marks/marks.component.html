@@ -1,0 +1,113 @@
+<!-- marks.component.html -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-bar-chart me-2 text-primary"></i>Marks & Grades</h4>
+  <button class="btn btn-primary" (click)="showModal=true;form.reset({exam_type:'internal1',max_marks:100,semester:1,year:2024})" *ngIf="auth.isFaculty()">
+    <i class="bi bi-plus-circle me-1"></i>Add Marks
+  </button>
+</div>
+
+<div class="card border-0 shadow-sm mb-3" style="border-radius:12px;">
+  <div class="card-body py-2">
+    <div class="row g-2">
+      <div class="col-md-4">
+        <select class="form-select form-select-sm" [(ngModel)]="filterStudent" (change)="load()">
+          <option value="">All Students</option>
+          <option *ngFor="let s of students" [value]="s.id">{{ s.first_name }} {{ s.last_name }}</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <select class="form-select form-select-sm" [(ngModel)]="filterCourse" (change)="load()">
+          <option value="">All Courses</option>
+          <option *ngFor="let c of courses" [value]="c.id">{{ c.course_name }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm" style="border-radius:12px;">
+  <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+  <div class="table-responsive" *ngIf="!loading">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr><th>Student</th><th>Course</th><th>Exam Type</th><th>Marks</th><th>%</th><th>Grade</th><th>Semester</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of marks">
+          <td>
+            <div class="fw-semibold">{{ m.first_name }} {{ m.last_name }}</div>
+            <div class="text-muted small">{{ m.student_code }}</div>
+          </td>
+          <td>{{ m.course_name }}</td>
+          <td><span class="badge bg-secondary-subtle text-secondary text-capitalize">{{ m.exam_type }}</span></td>
+          <td>{{ m.obtained_marks }}/{{ m.max_marks }}</td>
+          <td>{{ (m.obtained_marks/m.max_marks*100).toFixed(1) }}%</td>
+          <td><span class="badge" [ngClass]="gradeClass(m.grade)">{{ m.grade }}</span></td>
+          <td>Sem {{ m.semester }} ({{ m.year }})</td>
+        </tr>
+        <tr *ngIf="!marks.length"><td colspan="7" class="text-center text-muted py-4">No marks records found</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Marks Modal -->
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showModal" style="background:rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow" style="border-radius:12px;">
+      <div class="modal-header border-0"><h5 class="modal-title fw-bold">Add Marks</h5><button class="btn-close" (click)="showModal=false"></button></div>
+      <div class="modal-body">
+        <form [formGroup]="form">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Student</label>
+              <select class="form-select" formControlName="student_id">
+                <option value="">Select...</option>
+                <option *ngFor="let s of students" [value]="s.id">{{ s.first_name }} {{ s.last_name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Course</label>
+              <select class="form-select" formControlName="course_id">
+                <option value="">Select...</option>
+                <option *ngFor="let c of courses" [value]="c.id">{{ c.course_name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Exam Type</label>
+              <select class="form-select" formControlName="exam_type">
+                <option *ngFor="let t of examTypes" [value]="t">{{ t | titlecase }}</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Max Marks</label>
+              <input type="number" class="form-control" formControlName="max_marks">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Obtained</label>
+              <input type="number" class="form-control" formControlName="obtained_marks">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Semester</label>
+              <input type="number" class="form-control" formControlName="semester" min="1" max="6">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Year</label>
+              <input type="number" class="form-control" formControlName="year">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Remarks</label>
+              <input class="form-control" formControlName="remarks">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-secondary" (click)="showModal=false">Cancel</button>
+        <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<!-- attendance.component.html -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-calendar-check me-2 text-primary"></i>Attendance</h4>
+  <div class="btn-group">
+    <button class="btn btn-sm" [class.btn-primary]="viewMode==='mark'" [class.btn-outline-primary]="viewMode!=='mark'" (click)="viewMode='mark'">Mark Attendance</button>
+    <button class="btn btn-sm" [class.btn-primary]="viewMode==='view'" [class.btn-outline-primary]="viewMode!=='view'" (click)="viewMode='view';loadRecords()">View Records</button>
+  </div>
+</div>
+
+<!-- Mark Attendance -->
+<div *ngIf="viewMode==='mark'">
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Course</label>
+          <select class="form-select" [(ngModel)]="selectedCourse" (change)="loadStudentsForCourse()">
+            <option value="">-- Select Course --</option>
+            <option *ngFor="let c of courses" [value]="c.id">{{ c.course_name }} ({{ c.course_code }})</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Date</label>
+          <input type="date" class="form-control" [(ngModel)]="selectedDate">
+        </div>
+        <div class="col-md-5 d-flex gap-2">
+          <button class="btn btn-success btn-sm" (click)="setAll('present')"><i class="bi bi-check-all me-1"></i>All Present</button>
+          <button class="btn btn-danger btn-sm" (click)="setAll('absent')"><i class="bi bi-x-circle me-1"></i>All Absent</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm" style="border-radius:12px;" *ngIf="attendanceRows.length">
+    <div class="card-body p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr><th>#</th><th>Student</th><th>Code</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of attendanceRows; let i=index">
+            <td>{{ i+1 }}</td>
+            <td class="fw-semibold">{{ row.student.first_name }} {{ row.student.last_name }}</td>
+            <td><span class="badge bg-secondary-subtle text-secondary">{{ row.student.student_code }}</span></td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <button class="btn" [class.btn-success]="row.status==='present'" [class.btn-outline-success]="row.status!=='present'" (click)="row.status='present'">Present</button>
+                <button class="btn" [class.btn-danger]="row.status==='absent'" [class.btn-outline-danger]="row.status!=='absent'" (click)="row.status='absent'">Absent</button>
+                <button class="btn" [class.btn-warning]="row.status==='late'" [class.btn-outline-warning]="row.status!=='late'" (click)="row.status='late'">Late</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer bg-white border-0 text-end">
+      <button class="btn btn-primary px-4" (click)="saveAttendance()" [disabled]="saving">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+        <i class="bi bi-save me-1" *ngIf="!saving"></i>Save Attendance
+      </button>
+    </div>
+  </div>
+  <div *ngIf="!attendanceRows.length && selectedCourse" class="text-center text-muted py-5">No students enrolled yet.</div>
+  <div *ngIf="!selectedCourse" class="text-center text-muted py-5"><i class="bi bi-arrow-up-circle fs-1 d-block mb-2"></i>Select a course to begin</div>
+</div>
+
+<!-- View Records -->
+<div *ngIf="viewMode==='view'">
+  <div class="card border-0 shadow-sm" style="border-radius:12px;">
+    <div class="card-header bg-white border-0 pt-3">
+      <select class="form-select w-auto" [(ngModel)]="selectedCourse" (change)="loadRecords()">
+        <option value="">-- All Courses --</option>
+        <option *ngFor="let c of courses" [value]="c.id">{{ c.course_name }}</option>
+      </select>
+    </div>
+    <div class="card-body p-0">
+      <div *ngIf="loading" class="text-center py-4"><div class="spinner-border text-primary"></div></div>
+      <table class="table table-hover align-middle mb-0" *ngIf="!loading">
+        <thead class="table-light">
+          <tr><th>Student</th><th>Course</th><th>Date</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of records">
+            <td>{{ r.first_name }} {{ r.last_name }}</td>
+            <td>{{ r.course_name }}</td>
+            <td>{{ r.date | date:'mediumDate' }}</td>
+            <td>
+              <span class="badge" [class.bg-success]="r.status==='present'" [class.bg-danger]="r.status==='absent'" [class.bg-warning]="r.status==='late'">{{ r.status | titlecase }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="!records.length"><td colspan="4" class="text-center text-muted py-4">No records found</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

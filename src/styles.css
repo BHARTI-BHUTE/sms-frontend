@@ -1,0 +1,59 @@
+/* Student Management System - Global Styles */
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #f4f6f9;
+  color: #333;
+}
+
+/* Sidebar nav links */
+.nav-link { padding: 0.5rem 0.75rem; transition: background 0.15s; }
+.nav-link:hover { background: rgba(255,255,255,0.1); }
+.nav-link.bg-primary { background: #0d6efd !important; }
+
+/* Cards */
+.card { transition: box-shadow 0.2s; }
+.card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important; }
+
+/* Tables */
+.table th { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em; color: #6c757d; }
+.table td { font-size: 14px; vertical-align: middle; }
+
+/* Badges */
+.badge { font-weight: 500; letter-spacing: 0.02em; }
+
+/* Buttons */
+.btn { border-radius: 8px; font-weight: 500; }
+.btn-primary { background: #0d6efd; border-color: #0d6efd; }
+
+/* Form controls */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  font-size: 14px;
+}
+.form-control:focus, .form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15);
+}
+
+/* Modal */
+.modal-content { border-radius: 12px !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+
+/* Animations */
+.card, .badge, .btn { transition: all 0.15s ease; }
+
+/* Page headers */
+h4.fw-bold { color: #1a1a2e; }
+
+/* Responsive sidebar */
+@media (max-width: 768px) {
+  nav[style*="width:250px"] { width: 200px !important; }
+}

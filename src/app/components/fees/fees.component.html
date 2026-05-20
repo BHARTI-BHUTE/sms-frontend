@@ -1,0 +1,160 @@
+<!-- fees.component.html -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-cash-coin me-2 text-primary"></i>Fees Management</h4>
+  <button class="btn btn-primary" (click)="showAddModal=true" *ngIf="auth.isFaculty()">
+    <i class="bi bi-plus-circle me-1"></i>Add Fee
+  </button>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm text-center" style="border-radius:12px;">
+      <div class="card-body py-3">
+        <div class="text-muted small mb-1">Total Fees</div>
+        <div class="fs-4 fw-bold text-primary">₹{{ summary.total_fees | number:'1.0-0' }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm text-center" style="border-radius:12px;">
+      <div class="card-body py-3">
+        <div class="text-muted small mb-1">Collected</div>
+        <div class="fs-4 fw-bold text-success">₹{{ summary.collected | number:'1.0-0' }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm text-center" style="border-radius:12px;">
+      <div class="card-body py-3">
+        <div class="text-muted small mb-1">Pending</div>
+        <div class="fs-4 fw-bold text-warning">₹{{ summary.pending | number:'1.0-0' }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm text-center" style="border-radius:12px;">
+      <div class="card-body py-3">
+        <div class="text-muted small mb-1">Overdue</div>
+        <div class="fs-4 fw-bold text-danger">₹{{ summary.overdue | number:'1.0-0' }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm" style="border-radius:12px;">
+  <div class="card-header bg-white border-0 pt-3">
+    <select class="form-select w-auto form-select-sm" [(ngModel)]="filterStatus" (change)="load()">
+      <option value="">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="paid">Paid</option>
+      <option value="overdue">Overdue</option>
+    </select>
+  </div>
+  <div class="card-body p-0">
+    <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+    <table class="table table-hover align-middle mb-0" *ngIf="!loading">
+      <thead class="table-light">
+        <tr><th>Student</th><th>Fee Type</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of fees">
+          <td><div class="fw-semibold">{{ f.first_name }} {{ f.last_name }}</div><div class="text-muted small">{{ f.student_code }}</div></td>
+          <td><span class="badge bg-secondary-subtle text-secondary text-capitalize">{{ f.fee_type }}</span></td>
+          <td class="fw-bold">₹{{ f.amount | number:'1.0-0' }}</td>
+          <td>{{ f.due_date | date:'mediumDate' }}</td>
+          <td><span class="badge text-capitalize" [ngClass]="statusClass(f.status)">{{ f.status }}</span></td>
+          <td>
+            <button class="btn btn-sm btn-success" *ngIf="f.status!=='paid' && auth.isFaculty()" (click)="openPay(f.id)">
+              <i class="bi bi-check-circle me-1"></i>Pay
+            </button>
+            <span *ngIf="f.status==='paid'" class="text-success small"><i class="bi bi-check-circle-fill me-1"></i>Paid {{ f.paid_date | date:'shortDate' }}</span>
+          </td>
+        </tr>
+        <tr *ngIf="!fees.length"><td colspan="6" class="text-center text-muted py-4">No fee records found</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Fee Modal -->
+<div class="modal fade show d-block" *ngIf="showAddModal" tabindex="-1" style="background:rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow" style="border-radius:12px;">
+      <div class="modal-header border-0"><h5 class="modal-title fw-bold">Add Fee Record</h5><button class="btn-close" (click)="showAddModal=false"></button></div>
+      <div class="modal-body">
+        <form [formGroup]="form">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label fw-semibold">Student</label>
+              <select class="form-select" formControlName="student_id">
+                <option value="">Select student...</option>
+                <option *ngFor="let s of students" [value]="s.id">{{ s.first_name }} {{ s.last_name }} ({{ s.student_code }})</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Fee Type</label>
+              <select class="form-select" formControlName="fee_type">
+                <option *ngFor="let t of feeTypes" [value]="t">{{ t | titlecase }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Amount (₹)</label>
+              <input type="number" class="form-control" formControlName="amount">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Due Date</label>
+              <input type="date" class="form-control" formControlName="due_date">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Semester</label>
+              <input type="number" class="form-control" formControlName="semester" min="1" max="6">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Year</label>
+              <input type="number" class="form-control" formControlName="year">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-secondary" (click)="showAddModal=false">Cancel</button>
+        <button class="btn btn-primary" (click)="add()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pay Modal -->
+<div class="modal fade show d-block" *ngIf="showPayModal" tabindex="-1" style="background:rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow" style="border-radius:12px;">
+      <div class="modal-header border-0"><h5 class="modal-title fw-bold">Record Payment</h5><button class="btn-close" (click)="showPayModal=false"></button></div>
+      <div class="modal-body">
+        <form [formGroup]="payForm">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Payment Method</label>
+            <select class="form-select" formControlName="payment_method">
+              <option value="cash">Cash</option>
+              <option value="online">Online</option>
+              <option value="cheque">Cheque</option>
+              <option value="dd">DD</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label fw-semibold">Transaction ID (optional)</label>
+            <input class="form-control" formControlName="transaction_id">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-secondary" (click)="showPayModal=false">Cancel</button>
+        <button class="btn btn-success" (click)="pay()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>Confirm Payment
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

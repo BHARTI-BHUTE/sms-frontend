@@ -1,0 +1,85 @@
+<!-- courses.component.html -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-journal-bookmark me-2 text-primary"></i>Courses</h4>
+  <button class="btn btn-primary" (click)="openAdd()" *ngIf="auth.isAdmin()">
+    <i class="bi bi-plus-circle me-1"></i>Add Course
+  </button>
+</div>
+
+<div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+
+<div class="row g-3" *ngIf="!loading">
+  <div class="col-md-4" *ngFor="let c of courses">
+    <div class="card border-0 shadow-sm h-100" style="border-radius:12px;">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="badge bg-primary">{{ c.course_code }}</span>
+          <span class="badge bg-success-subtle text-success">Sem {{ c.semester }}</span>
+        </div>
+        <h6 class="fw-bold mb-1">{{ c.course_name }}</h6>
+        <p class="text-muted small mb-2">{{ c.department_name }}</p>
+        <div class="d-flex gap-2 mb-2">
+          <span class="badge bg-info-subtle text-info"><i class="bi bi-star me-1"></i>{{ c.credits }} Credits</span>
+        </div>
+        <p class="small text-muted mb-3">{{ c.description || 'No description available.' }}</p>
+        <div class="d-flex gap-2" *ngIf="auth.isAdmin()">
+          <button class="btn btn-sm btn-outline-primary flex-fill" (click)="openEdit(c)"><i class="bi bi-pencil me-1"></i>Edit</button>
+          <button class="btn btn-sm btn-outline-danger flex-fill" (click)="delete(c.id)"><i class="bi bi-trash me-1"></i>Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12" *ngIf="!courses.length">
+    <div class="text-center py-5 text-muted"><i class="bi bi-journal-x fs-1 d-block mb-2"></i>No courses found</div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showModal" style="background:rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow" style="border-radius:12px;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">{{ isEdit ? 'Edit' : 'Add' }} Course</h5>
+        <button class="btn-close" (click)="showModal=false"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="form">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label fw-semibold">Course Name</label>
+              <input class="form-control" formControlName="course_name" placeholder="e.g. Data Structures">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Code</label>
+              <input class="form-control" formControlName="course_code" placeholder="CS101">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Department</label>
+              <select class="form-select" formControlName="department_id">
+                <option *ngFor="let d of departments" [value]="d.id">{{ d.name }}</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Credits</label>
+              <input type="number" class="form-control" formControlName="credits" min="1" max="6">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Semester</label>
+              <input type="number" class="form-control" formControlName="semester" min="1" max="6">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Description</label>
+              <textarea class="form-control" formControlName="description" rows="2"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-secondary" (click)="showModal=false">Cancel</button>
+        <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
