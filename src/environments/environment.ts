@@ -1,3 +1,4 @@
 export const environment = {
-  production: false
+  production: true,
+  apiUrl: 'https://sms-backend-production-972b.up.railway.app'
 };
