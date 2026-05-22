@@ -16,30 +16,53 @@
             "outputPath": "dist/sms-frontend/browser",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
-        "assets": [
-  "src/favicon.ico",
-  "src/assets",
-  "src/_redirects"
-],
-            "styles": ["src/styles.css"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/_redirects"
+            ],
+            "styles": [
+              "src/styles.css"
+            ],
             "scripts": []
           },
           "configurations": {
             "production": {
-              "budgets": [{"type":"initial","maximumWarning":"500mb","maximumError":"1gb"},{"type":"anyComponentStyle","maximumWarning":"2mb","maximumError":"4mb"}],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500mb",
+                  "maximumError": "1gb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2mb",
+                  "maximumError": "4mb"
+                }
+              ],
               "outputHashing": "all"
             },
-            "development": { "optimization": false, "extractLicenses": false, "sourceMap": true }
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
-            "production": { "buildTarget": "sms-frontend:build:production" },
-            "development": { "buildTarget": "sms-frontend:build:development" }
+            "production": {
+              "buildTarget": "sms-frontend:build:production"
+            },
+            "development": {
+              "buildTarget": "sms-frontend:build:development"
+            }
           },
           "defaultConfiguration": "development"
         }
