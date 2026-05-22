@@ -2,9 +2,7 @@
   "name": "sms-frontend",
   "version": "1.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build"
+    "build": "npx ng build --configuration production"
   },
   "dependencies": {
     "@angular/animations": "^17.0.0",
@@ -21,7 +19,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.0.0",
-    "@angular/cli": "^17.3.17",
+    "@angular/cli": "^17.0.0",
     "@angular/compiler-cli": "^17.0.0",
     "ajv": "^8.20.0",
     "typescript": "~5.2.2"
