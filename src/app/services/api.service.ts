@@ -2,7 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const BASE = 'http://localhost:3000/api';
+// const BASE = 'http://localhost:3000/api';
+
+// ✅ replace with
+import { environment } from '../../environments/environment';
+const BASE = environment.apiUrl + '/api';
 
 function toParams(obj: any): HttpParams {
   let p = new HttpParams();
